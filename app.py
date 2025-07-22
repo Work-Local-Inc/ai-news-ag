@@ -393,6 +393,66 @@ else:
         st.markdown("- Google Gemini powered")
         st.markdown("- Requires API keys")
 
+# Slack Integration Section
+st.markdown("---")
+st.markdown("## 🚀 Slack Integration")
+
+slack_col1, slack_col2 = st.columns(2)
+
+with slack_col1:
+    st.markdown("""
+    **📱 Daily News to Slack**
+    - Automated 8 AM daily updates
+    - Beautiful formatted messages
+    - Article images and links
+    - Source attribution
+    """)
+    
+    if st.button("📋 View Setup Guide", use_container_width=True):
+        st.info("See SLACK_SETUP.md file for detailed instructions!")
+
+with slack_col2:
+    st.markdown("**🧪 Test Integration**")
+    
+    if st.button("🔗 Test Slack Connection", use_container_width=True):
+        try:
+            from slack_notifier import SlackNotifier
+            slack = SlackNotifier()
+            with st.spinner("Testing connection..."):
+                if slack.test_connection():
+                    st.success("✅ Slack connection successful!")
+                else:
+                    st.error("❌ Connection failed. Check your environment variables.")
+        except ImportError:
+            st.warning("📦 Install slack-sdk: `pip install slack-sdk`")
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
+    
+    if st.button("📤 Send Test News", use_container_width=True):
+        if 'articles' in st.session_state and st.session_state.articles:
+            try:
+                from slack_notifier import SlackNotifier
+                slack = SlackNotifier()
+                
+                with st.spinner("Sending to Slack..."):
+                    # Use current articles for test
+                    test_articles = st.session_state.articles[:5]  # Limit to 5 for testing
+                    stats = {
+                        'hacker_news_count': len([a for a in test_articles if a.get('source') == 'Hacker News']),
+                        'news_api_count': len([a for a in test_articles if a.get('source') != 'Hacker News'])
+                    }
+                    
+                    if slack.send_daily_news(test_articles, stats):
+                        st.success("✅ Test news sent to Slack!")
+                    else:
+                        st.error("❌ Failed to send. Check your Slack setup.")
+            except ImportError:
+                st.warning("📦 Install slack-sdk: `pip install slack-sdk`")
+            except Exception as e:
+                st.error(f"❌ Error: {e}")
+        else:
+            st.warning("⚠️ Load some articles first!")
+
 # Footer
 st.markdown("---")
 col1, col2, col3 = st.columns(3)

@@ -453,6 +453,13 @@ with slack_col2:
         else:
             st.warning("⚠️ Load some articles first!")
 
+# Streamlit Cloud Scheduler
+try:
+    from streamlit_scheduler import create_scheduler_ui
+    create_scheduler_ui()
+except ImportError:
+    st.info("💡 Install scheduler dependencies for automated daily updates")
+
 # Footer
 st.markdown("---")
 col1, col2, col3 = st.columns(3)

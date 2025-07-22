@@ -230,23 +230,57 @@ if st.session_state.articles:
         avg_score = sum(article.get('score', 0) for article in st.session_state.articles) / len(st.session_state.articles)
         st.metric("Avg HN Score", f"{avg_score:.1f}")
     
-    # Display articles in proper card grid layout
+    # Display articles in proper card grid layout with images
     
     # Create cards in a responsive grid
     cols_per_row = 2  # Two cards per row
     
     for i in range(0, len(st.session_state.articles), cols_per_row):
         row_articles = st.session_state.articles[i:i+cols_per_row]
-        cols = st.columns(cols_per_row)
+        cols = st.columns(cols_per_row, gap="medium")
         
         for idx, article in enumerate(row_articles):
             with cols[idx]:
-                # Create individual card container
+                # Create individual card container with image
                 with st.container():
-                    # Card header with title
-                    st.markdown(f"**📄 [{article['title'][:50]}...]({article['url']})**")
                     
-                    # Source badge and score
+                    # Get article image
+                    if 'image_url' not in article:
+                        # Try to extract real image first, fallback to placeholder
+                        try:
+                            article['image_url'] = ArticleImageExtractor.get_article_image(
+                                article['url'], 
+                                article['title']
+                            )
+                        except:
+                            article['image_url'] = ArticleImageExtractor.get_source_specific_image(
+                                article.get('source', 'Unknown'),
+                                article['title']
+                            )
+                    
+                    # Display card image
+                    try:
+                        st.image(article['image_url'], use_container_width=True)
+                    except:
+                        # Fallback to a simple colored placeholder
+                        st.markdown(f"""
+                        <div style="
+                            height: 150px; 
+                            background: linear-gradient(45deg, #667eea, #764ba2); 
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 24px;
+                            margin-bottom: 1rem;
+                        ">📰</div>
+                        """, unsafe_allow_html=True)
+                    
+                    # Card header with title
+                    st.markdown(f"**[{article['title'][:60]}...]({article['url']})**")
+                    
+                    # Source badge and score row
                     source_col, score_col = st.columns([2, 1])
                     with source_col:
                         if article.get('source') == "Hacker News":
@@ -256,19 +290,20 @@ if st.session_state.articles:
                     
                     with score_col:
                         if article.get('score', 0) > 0:
-                            st.metric("", f"{article['score']} pts", "HN Score")
+                            st.metric("", f"{article['score']} pts", "HN")
                     
                     # Date
                     st.caption(f"📅 {article.get('published', 'Unknown')[:10]}")
                     
-                    # Description preview
+                    # Description preview (shorter for image cards)
                     if article.get('description'):
-                        description = article['description'][:120] + "..." if len(article['description']) > 120 else article['description']
-                        st.text(description)
+                        description = article['description'][:100] + "..." if len(article['description']) > 100 else article['description']
+                        st.caption(description)
                     
                     # Action buttons - stacked vertically for cards
                     if st.button(f"📖 Read Article", key=f"read_{i}_{idx}", use_container_width=True):
-                        st.markdown(f"[🔗 Open in new tab]({article['url']})")
+                        st.balloons()
+                        st.markdown(f"Opening: {article['url']}")
                     
                     # AI Summary section
                     if ai_provider != "None":
@@ -297,6 +332,7 @@ if st.session_state.articles:
                     # Share button
                     if st.button("📤 Share", key=f"share_{i}_{idx}", use_container_width=True):
                         st.code(article['url'], language=None)
+                        st.success("📋 URL ready to copy!")
                 
                 # Add visual separation between cards
                 st.markdown("---")

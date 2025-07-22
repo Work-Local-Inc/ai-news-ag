@@ -46,7 +46,13 @@
                         """, unsafe_allow_html=True)
                     
                     # Card header with title
-                    st.markdown(f"**[{article['title'][:60]}...]({article['url']})**")
+                    st.markdown(f"""
+                    <h2 style="color: white; font-size: 1.5rem; margin-bottom: 0.5rem;">
+                        <a href="{article['url']}" target="_blank" style="color: white; text-decoration: none;">
+                            {article['title'][:60]}...
+                        </a>
+                    </h2>
+                    """, unsafe_allow_html=True)
                     
                     # Source badge and score row
                     source_col, score_col = st.columns([2, 1])

@@ -10,3 +10,6 @@ fuzzywuzzy
 python-levenshtein
 beautifulsoup4
 beautifulsoup4
+slack-sdk
+schedule
+python-crontab

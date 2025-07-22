@@ -1,9 +1,9 @@
-    # Display articles in proper card grid layout with images
-    
-    # Create cards in a responsive grid
-    cols_per_row = 2  # Two cards per row
-    
-    for i in range(0, len(st.session_state.articles), cols_per_row):
+# Display articles in proper card grid layout with images
+
+# Create cards in a responsive grid
+cols_per_row = 2  # Two cards per row
+
+for i in range(0, len(st.session_state.articles), cols_per_row):
         row_articles = st.session_state.articles[i:i+cols_per_row]
         cols = st.columns(cols_per_row, gap="medium")
         

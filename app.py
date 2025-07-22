@@ -15,10 +15,18 @@ st.markdown("*Stay updated with the latest AI developments*")
 
 # Sidebar filters
 st.sidebar.header("Filters")
+
+# News type selection
+news_type = st.sidebar.selectbox(
+    "News Type:",
+    ["Everything", "Top Headlines"],
+    help="Everything = all articles, Headlines = breaking news only"
+)
+
 news_sources = st.sidebar.multiselect(
     "Select Sources:",
     ["NewsAPI", "Google News", "TechCrunch", "Ars Technica"],
-    default=["NewsAPI", "Google News"]
+    default=["NewsAPI"]
 )
 
 search_query = st.sidebar.text_input("Custom Search:", value="artificial intelligence")
@@ -40,8 +48,12 @@ if st.sidebar.button("🔄 Refresh News"):
         
         # Fetch from NewsAPI if selected
         if "NewsAPI" in news_sources:
-            news_data = news_api.get_ai_news(query=search_query, page_size=num_articles)
-            if news_data and 'articles' in news_data:
+            if news_type == "Top Headlines":
+                news_data = news_api.get_top_ai_headlines(page_size=num_articles)
+            else:
+                news_data = news_api.get_ai_news(query=search_query, page_size=num_articles)
+            
+            if news_data and news_data.get('status') == 'ok' and 'articles' in news_data:
                 for article in news_data['articles']:
                     all_articles.append({
                         'title': article['title'],

@@ -1,34 +1,43 @@
-import requests
 import os
 from dotenv import load_dotenv
 import feedparser
 from datetime import datetime
+from newsapi import NewsApiClient
 
 # Load environment variables
 load_dotenv()
 
 class NewsAPI:
     def __init__(self):
-        self.api_key = os.getenv('NEWS_API_KEY')
-        self.base_url = "https://newsapi.org/v2/"
+        api_key = os.getenv('NEWS_API_KEY')
+        self.newsapi = NewsApiClient(api_key=api_key)
     
     def get_ai_news(self, query="artificial intelligence", page_size=20):
-        """Fetch AI news from NewsAPI"""
-        url = f"{self.base_url}everything"
-        params = {
-            'q': query,
-            'apiKey': self.api_key,
-            'pageSize': page_size,
-            'sortBy': 'publishedAt',
-            'language': 'en'
-        }
-        
+        """Fetch AI news from NewsAPI using official client"""
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
+            # Get everything about AI
+            response = self.newsapi.get_everything(
+                q=query,
+                language='en',
+                sort_by='publishedAt',
+                page_size=page_size
+            )
+            return response
+        except Exception as e:
             print(f"Error fetching from NewsAPI: {e}")
+            return None
+
+    def get_top_ai_headlines(self, page_size=20):
+        """Get top AI headlines"""
+        try:
+            response = self.newsapi.get_top_headlines(
+                q='artificial intelligence',
+                language='en',
+                page_size=page_size
+            )
+            return response
+        except Exception as e:
+            print(f"Error fetching top headlines: {e}")
             return None
 
 class RSSFetcher:
@@ -66,13 +75,22 @@ if __name__ == "__main__":
     # Test the APIs
     print("Testing NewsAPI...")
     news_api = NewsAPI()
-    news_data = news_api.get_ai_news()
     
-    if news_data and 'articles' in news_data:
-        print(f"✅ NewsAPI working! Found {len(news_data['articles'])} articles")
-        print(f"First article: {news_data['articles'][0]['title']}")
+    # Test everything endpoint
+    news_data = news_api.get_ai_news()
+    if news_data and news_data['status'] == 'ok':
+        print(f"✅ NewsAPI Everything working! Found {len(news_data['articles'])} articles")
+        if news_data['articles']:
+            print(f"First article: {news_data['articles'][0]['title']}")
     else:
-        print("❌ NewsAPI failed")
+        print("❌ NewsAPI Everything failed")
+    
+    # Test top headlines
+    headlines = news_api.get_top_ai_headlines()
+    if headlines and headlines['status'] == 'ok':
+        print(f"✅ NewsAPI Headlines working! Found {len(headlines['articles'])} headlines")
+    else:
+        print("❌ NewsAPI Headlines failed")
     
     print("\nTesting RSS feeds...")
     rss = RSSFetcher()

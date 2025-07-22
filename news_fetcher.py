@@ -196,7 +196,7 @@ class AISummaryGenerator:
             if not self.google_api_key:
                 return "Google API key not configured"
             
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             text_to_summarize = f"Title: {title}\nDescription: {description}\nContent: {content[:1000]}"
             
             if adhd_friendly:

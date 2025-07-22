@@ -9,9 +9,22 @@
         
         for idx, article in enumerate(row_articles):
             with cols[idx]:
-                # Create individual card container with image
+                # Create modern card with custom styling
+                st.markdown(f"""
+                <div style="
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 16px;
+                    padding: 0;
+                    margin-bottom: 2rem;
+                    overflow: hidden;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                ">
+                """, unsafe_allow_html=True)
+                
                 with st.container():
-                    
                     # Get article image
                     if 'image_url' not in article:
                         # Try to extract real image first, fallback to placeholder
@@ -26,66 +39,137 @@
                                 article['title']
                             )
                     
-                    # Display card image
+                    # Display card image with rounded corners
                     try:
-                        st.image(article['image_url'], use_container_width=True)
+                        st.markdown(f"""
+                        <img src="{article['image_url']}" style="
+                            width: 100%;
+                            height: 200px;
+                            object-fit: cover;
+                            border-radius: 16px 16px 0 0;
+                            margin-bottom: 0;
+                        ">
+                        """, unsafe_allow_html=True)
                     except:
-                        # Fallback to a simple colored placeholder
+                        # Fallback to a beautiful gradient placeholder
                         st.markdown(f"""
                         <div style="
-                            height: 150px; 
-                            background: linear-gradient(45deg, #667eea, #764ba2); 
-                            border-radius: 8px;
+                            height: 200px; 
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
+                            border-radius: 16px 16px 0 0;
                             display: flex;
                             align-items: center;
                             justify-content: center;
                             color: white;
-                            font-size: 24px;
-                            margin-bottom: 1rem;
+                            font-size: 48px;
+                            margin-bottom: 0;
+                            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
                         ">📰</div>
                         """, unsafe_allow_html=True)
                     
-                    # Card header with title
+                    # Card content with padding
+                    st.markdown('<div style="padding: 1.5rem;">', unsafe_allow_html=True)
+                    
+                    # Card title - large, white, clickable
+                    title_text = article['title'][:80] + "..." if len(article['title']) > 80 else article['title']
                     st.markdown(f"""
-                    <h2 style="color: white; font-size: 1.5rem; margin-bottom: 0.5rem;">
-                        <a href="{article['url']}" target="_blank" style="color: white; text-decoration: none;">
-                            {article['title'][:60]}...
+                    <h2 style="
+                        color: #ffffff;
+                        font-size: 1.4rem;
+                        font-weight: 600;
+                        line-height: 1.3;
+                        margin: 0 0 1rem 0;
+                        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+                    ">
+                        <a href="{article['url']}" target="_blank" style="
+                            color: #ffffff;
+                            text-decoration: none;
+                            transition: color 0.2s ease;
+                        " onmouseover="this.style.color='#60a5fa'" onmouseout="this.style.color='#ffffff'">
+                            {title_text}
                         </a>
                     </h2>
                     """, unsafe_allow_html=True)
                     
-                    # Source badge and score row
-                    source_col, score_col = st.columns([2, 1])
-                    with source_col:
-                        if article.get('source') == "Hacker News":
-                            st.markdown("🟢 **Hacker News**")
-                        else:
-                            st.markdown(f"🔵 **{article.get('source', 'Unknown')}**")
+                    # Source badge and score in a nice row
+                    source_text = "Hacker News" if article.get('source') == "Hacker News" else article.get('source', 'Unknown')
+                    source_emoji = "🟢" if article.get('source') == "Hacker News" else "🔵"
+                    score_text = f" • {article.get('score', 0)} pts" if article.get('score', 0) > 0 else ""
                     
-                    with score_col:
-                        if article.get('score', 0) > 0:
-                            st.metric("", f"{article['score']} pts", "HN")
+                    st.markdown(f"""
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        margin-bottom: 0.75rem;
+                        color: #cbd5e1;
+                        font-size: 0.9rem;
+                    ">
+                        <span style="
+                            background: rgba(255, 255, 255, 0.1);
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-weight: 500;
+                        ">
+                            {source_emoji} {source_text}{score_text}
+                        </span>
+                        <span>📅 {article.get('published', 'Unknown')[:10]}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
-                    # Date
-                    st.caption(f"📅 {article.get('published', 'Unknown')[:10]}")
-                    
-                    # Description preview (shorter for image cards)
+                    # Description with better styling
                     if article.get('description'):
-                        description = article['description'][:100] + "..." if len(article['description']) > 100 else article['description']
-                        st.caption(description)
+                        description = article['description'][:120] + "..." if len(article['description']) > 120 else article['description']
+                        st.markdown(f"""
+                        <p style="
+                            color: #94a3b8;
+                            font-size: 0.95rem;
+                            line-height: 1.5;
+                            margin: 0 0 1.5rem 0;
+                        ">{description}</p>
+                        """, unsafe_allow_html=True)
                     
-                    # Action buttons - stacked vertically for cards
-                    if st.button(f"📖 Read Article", key=f"read_{i}_{idx}", use_container_width=True):
-                        st.balloons()
-                        st.markdown(f"Opening: {article['url']}")
+                    # Modern action buttons
+                    button_col1, button_col2 = st.columns(2)
                     
-                    # AI Summary section
+                    with button_col1:
+                        if st.button(f"📖 Read", key=f"read_{i}_{idx}", use_container_width=True):
+                            st.balloons()
+                            st.markdown(f"Opening: {article['url']}")
+                    
+                    with button_col2:
+                        if st.button("📤 Share", key=f"share_{i}_{idx}", use_container_width=True):
+                            st.code(article['url'], language=None)
+                            st.success("📋 URL ready to copy!")
+                    
+                    # AI Summary section with modern styling
                     if ai_provider != "None":
                         summary_key = f"summary_{i}_{idx}"
                         
                         if summary_key in st.session_state.summaries:
-                            st.success("🧠 AI Summary")
-                            st.markdown(st.session_state.summaries[summary_key])
+                            st.markdown(f"""
+                            <div style="
+                                background: rgba(34, 197, 94, 0.1);
+                                border: 1px solid rgba(34, 197, 94, 0.3);
+                                border-radius: 12px;
+                                padding: 1rem;
+                                margin-top: 1rem;
+                            ">
+                                <div style="
+                                    color: #10b981;
+                                    font-weight: 600;
+                                    margin-bottom: 0.5rem;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                ">
+                                    🧠 AI Summary
+                                </div>
+                                <div style="color: #e2e8f0; line-height: 1.6;">
+                                    {st.session_state.summaries[summary_key]}
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
                         else:
                             if st.button(f"🤖 AI Summary", key=f"summarize_{i}_{idx}", use_container_width=True):
                                 with st.spinner("🧠 Generating..."):
@@ -103,13 +187,11 @@
                                     st.session_state.summaries[summary_key] = summary
                                     st.rerun()
                     
-                    # Share button
-                    if st.button("📤 Share", key=f"share_{i}_{idx}", use_container_width=True):
-                        st.code(article['url'], language=None)
-                        st.success("📋 URL ready to copy!")
+                    # Close card content padding
+                    st.markdown('</div>', unsafe_allow_html=True)
                 
-                # Add visual separation between cards
-                st.markdown("---")
+                # Close card container
+                st.markdown('</div>', unsafe_allow_html=True)
         
         # Add space between rows
         st.markdown("<br>", unsafe_allow_html=True)

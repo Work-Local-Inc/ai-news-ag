@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import ssl
 from datetime import datetime
 from typing import List, Dict
 from slack_sdk import WebClient
@@ -15,7 +16,15 @@ class SlackNotifier:
         self.channel = os.getenv('SLACK_CHANNEL', '#ai-news')
         
         if self.bot_token:
-            self.client = WebClient(token=self.bot_token)
+            # Create SSL context to handle certificate issues
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+            
+            self.client = WebClient(
+                token=self.bot_token,
+                ssl=ssl_context
+            )
         else:
             self.client = None
     

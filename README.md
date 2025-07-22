@@ -1,13 +1,6 @@
 # AI News Scraper 🤖
 
-A Streamlit app that aggregates AI news from multiple sources and provides AI-powered summaries.
-
-## 🚀 Live Demo
-Deploy to Streamlit Cloud: [![Deploy](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
-
-# AI News Scraper 🤖
-
-A comprehensive Streamlit app that aggregates AI news from multiple sources, removes duplicates, and provides AI-powered summaries.
+A comprehensive Streamlit app that aggregates AI news from multiple sources, removes duplicates, provides AI-powered summaries, and sends daily updates to Slack.
 
 ## 🚀 Live Demo
 Deploy to Streamlit Cloud: [![Deploy](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
@@ -37,6 +30,12 @@ Deploy to Streamlit Cloud: [![Deploy](https://static.streamlit.io/badges/streaml
 - ✅ Publication timestamps
 - ✅ Article count tracking
 
+### 📱 **Slack Integration**
+- ✅ **Daily automated updates** - Sends curated news at 8 AM
+- ✅ **Beautiful formatted messages** - Rich blocks with images and links
+- ✅ **Source attribution** - Clear badges for Hacker News vs other sources
+- ✅ **Easy setup** - Bot token or webhook integration
+
 ## 🛠️ Setup
 
 1. **Clone the repo:**
@@ -54,7 +53,7 @@ pip install -r requirements.txt
    - **NewsAPI:** Sign up at [NewsAPI.org](https://newsapi.org/register) (free, 1000/day)
    - **OpenAI (optional):** Get key at [platform.openai.com](https://platform.openai.com/api-keys) (paid)
    - **Google Gemini (optional):** Get key at [ai.google.dev](https://ai.google.dev/) (has free tier!)
-   - Copy `.env.example` to `.env`
+   - **Slack (optional):** Set up bot at [api.slack.com/apps](https://api.slack.com/apps) - see `SLACK_SETUP.md`
    - Add your API keys to `.env`
 
 4. **Run the app:**
@@ -62,10 +61,21 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## 🧪 Test API Connection
+## 🧪 Testing
 
+**Test API connections:**
 ```bash
 python news_fetcher.py
+```
+
+**Test Slack integration:**
+```bash
+./test_slack.py
+```
+
+**Start daily scheduler:**
+```bash
+./start_daily_scheduler.sh
 ```
 
 ## 🚀 Deploy to Streamlit Cloud
@@ -76,10 +86,38 @@ python news_fetcher.py
 4. Add your `NEWS_API_KEY` to the secrets section
 5. Deploy!
 
+## 📱 Slack Daily Updates
+
+Set up automated daily news updates to your Slack workspace:
+
+1. **Setup:** Follow the detailed guide in `SLACK_SETUP.md`
+2. **Test:** Run `./test_slack.py` to verify connection
+3. **Schedule:** Run `./start_daily_scheduler.sh` for 8 AM daily updates
+4. **Deploy:** Set up on a server or cloud function for 24/7 operation
+
+## 📁 Project Structure
+
+```
+ai-news-ag/
+├── app.py                 # Main Streamlit app
+├── news_fetcher.py        # News aggregation logic
+├── card_layout.py         # UI card components
+├── slack_notifier.py      # Slack integration
+├── daily_scheduler.py     # Automated scheduling
+├── test_slack.py          # Slack testing script
+├── start_daily_scheduler.sh # Easy startup script
+├── SLACK_SETUP.md         # Detailed Slack setup guide
+└── requirements.txt       # Python dependencies
+```
+
 ## 📝 TODO
 
-- [ ] Fix RSS feed parsing
-- [ ] Add AI summary integration
-- [ ] Add article sentiment analysis
+- [x] Multiple news sources integration
+- [x] AI-powered summaries  
+- [x] Smart deduplication
+- [x] Modern card-based UI
+- [x] Slack daily updates
 - [ ] Export to PDF/CSV
 - [ ] Email digest feature
+- [ ] Article sentiment analysis
+- [ ] Mobile app version

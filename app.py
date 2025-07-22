@@ -311,7 +311,6 @@ if st.session_state.articles:
                         {article['title'][:40]}{'...' if len(article['title']) > 40 else ''}
                     </a>
                     """, unsafe_allow_html=True)
-                    """, unsafe_allow_html=True)
                     
                     # Source badge (compact)
                     if article.get('source') == "Hacker News":
@@ -373,30 +372,26 @@ else:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
-        **NewsAPI**
-        - Professional news sources
-        - 1,000 requests/day (free)
-        - Real-time updates
-        
-        **Hacker News**
-        - Tech community favorites
-        - No API limits
-        - Story scores included
-        """)
+        st.markdown("**NewsAPI**")
+        st.markdown("- Professional news sources")
+        st.markdown("- 1,000 requests/day (free)")
+        st.markdown("- Real-time updates")
+        st.markdown("")
+        st.markdown("**Hacker News**")
+        st.markdown("- Tech community favorites")
+        st.markdown("- No API limits")
+        st.markdown("- Story scores included")
     
     with col2:
-        st.markdown("""
-        **RSS Feeds**
-        - Google News AI search
-        - TechCrunch AI coverage
-        - Ars Technica tech news
-        
-        **AI Summaries**
-        - OpenAI GPT-3.5 powered
-        - Google Gemini powered
-        - Requires API keys
-        """)
+        st.markdown("**RSS Feeds**")
+        st.markdown("- Google News AI search")
+        st.markdown("- TechCrunch AI coverage") 
+        st.markdown("- Ars Technica tech news")
+        st.markdown("")
+        st.markdown("**AI Summaries**")
+        st.markdown("- OpenAI GPT-3.5 powered")
+        st.markdown("- Google Gemini powered")
+        st.markdown("- Requires API keys")
 
 # Footer
 st.markdown("---")

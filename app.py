@@ -232,16 +232,16 @@ if st.session_state.articles:
     
     # Display articles in proper card grid layout with images
     
-    # Create cards in a responsive grid
-    cols_per_row = 2  # Two cards per row
+    # Create cards in a responsive grid (4 per row for compact cards)
+    cols_per_row = 4  # Four compact cards per row
     
     for i in range(0, len(st.session_state.articles), cols_per_row):
         row_articles = st.session_state.articles[i:i+cols_per_row]
-        cols = st.columns(cols_per_row, gap="medium")
+        cols = st.columns(cols_per_row, gap="small")
         
         for idx, article in enumerate(row_articles):
             with cols[idx]:
-                # Create individual card container with image
+                # Create individual compact card container with image
                 with st.container():
                     
                     # Get article image
@@ -258,63 +258,60 @@ if st.session_state.articles:
                                 article['title']
                             )
                     
-                    # Display card image
+                    # Display compact card image
                     try:
                         st.image(article['image_url'], use_container_width=True)
                     except:
-                        # Fallback to a simple colored placeholder
+                        # Fallback to a simple colored placeholder (smaller)
                         st.markdown(f"""
                         <div style="
-                            height: 150px; 
+                            height: 120px; 
                             background: linear-gradient(45deg, #667eea, #764ba2); 
-                            border-radius: 8px;
+                            border-radius: 6px;
                             display: flex;
                             align-items: center;
                             justify-content: center;
                             color: white;
-                            font-size: 24px;
-                            margin-bottom: 1rem;
+                            font-size: 18px;
+                            margin-bottom: 0.5rem;
                         ">📰</div>
                         """, unsafe_allow_html=True)
                     
-                    # Card header with title
-                    st.markdown(f"**[{article['title'][:60]}...]({article['url']})**")
+                    # Compact card header with shorter title
+                    st.markdown(f"**[{article['title'][:35]}...]({article['url']})**")
                     
-                    # Source badge and score row
-                    source_col, score_col = st.columns([2, 1])
-                    with source_col:
-                        if article.get('source') == "Hacker News":
-                            st.markdown("🟢 **Hacker News**")
-                        else:
-                            st.markdown(f"🔵 **{article.get('source', 'Unknown')}**")
-                    
-                    with score_col:
+                    # Source badge (compact)
+                    if article.get('source') == "Hacker News":
+                        st.markdown("🟢 **HN**")
                         if article.get('score', 0) > 0:
-                            st.metric("", f"{article['score']} pts", "HN")
+                            st.caption(f"⭐ {article['score']} pts")
+                    else:
+                        st.markdown(f"🔵 **{article.get('source', 'Unknown')[:8]}**")
                     
-                    # Date
+                    # Date (compact)
                     st.caption(f"📅 {article.get('published', 'Unknown')[:10]}")
                     
-                    # Description preview (shorter for image cards)
+                    # Description preview (much shorter for compact cards)
                     if article.get('description'):
-                        description = article['description'][:100] + "..." if len(article['description']) > 100 else article['description']
+                        description = article['description'][:60] + "..." if len(article['description']) > 60 else article['description']
                         st.caption(description)
                     
-                    # Action buttons - stacked vertically for cards
-                    if st.button(f"📖 Read Article", key=f"read_{i}_{idx}", use_container_width=True):
+                    # Compact action buttons
+                    if st.button(f"📖", key=f"read_{i}_{idx}", use_container_width=True, help="Read Article"):
                         st.balloons()
-                        st.markdown(f"Opening: {article['url']}")
+                        st.markdown(f"[🔗 {article['url']}]({article['url']})")
                     
-                    # AI Summary section
+                    # AI Summary section (compact)
                     if ai_provider != "None":
                         summary_key = f"summary_{i}_{idx}"
                         
                         if summary_key in st.session_state.summaries:
-                            st.success("🧠 AI Summary")
-                            st.markdown(st.session_state.summaries[summary_key])
+                            st.success("🧠")
+                            with st.expander("Summary", expanded=False):
+                                st.markdown(st.session_state.summaries[summary_key])
                         else:
-                            if st.button(f"🤖 AI Summary", key=f"summarize_{i}_{idx}", use_container_width=True):
-                                with st.spinner("🧠 Generating..."):
+                            if st.button(f"🤖", key=f"summarize_{i}_{idx}", use_container_width=True, help="AI Summary"):
+                                with st.spinner("🧠"):
                                     title = article['title']
                                     description = article.get('description', '')
                                     content = article.get('content', '')
@@ -328,11 +325,6 @@ if st.session_state.articles:
                                     
                                     st.session_state.summaries[summary_key] = summary
                                     st.rerun()
-                    
-                    # Share button
-                    if st.button("📤 Share", key=f"share_{i}_{idx}", use_container_width=True):
-                        st.code(article['url'], language=None)
-                        st.success("📋 URL ready to copy!")
                 
                 # Add visual separation between cards
                 st.markdown("---")

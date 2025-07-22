@@ -59,6 +59,22 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
     
+    /* Article title styling - look like headlines, not links */
+    .article-title {
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        line-height: 1.4 !important;
+        display: block !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .article-title:hover {
+        color: #4f46e5 !important;
+        text-decoration: none !important;
+        transform: none !important;
+    }
+    
     .source-badge {
         display: inline-block;
         padding: 0.25rem 0.5rem;
@@ -76,6 +92,18 @@ st.markdown("""
     .other-badge {
         background: #3b82f6;
         color: white;
+    }
+    
+    /* Clean article title links */
+    a.article-title {
+        text-decoration: none !important;
+        color: #1f2937 !important;
+        font-weight: 600 !important;
+        transition: color 0.2s ease;
+    }
+    a.article-title:hover {
+        color: #3b82f6 !important;
+        text-decoration: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -277,8 +305,13 @@ if st.session_state.articles:
                         ">📰</div>
                         """, unsafe_allow_html=True)
                     
-                    # Compact card header with shorter title
-                    st.markdown(f"**[{article['title'][:35]}...]({article['url']})**")
+                    # Compact card header with clean title (styled link)
+                    st.markdown(f"""
+                    <a href="{article['url']}" target="_blank" class="article-title">
+                        {article['title'][:40]}{'...' if len(article['title']) > 40 else ''}
+                    </a>
+                    """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
                     
                     # Source badge (compact)
                     if article.get('source') == "Hacker News":

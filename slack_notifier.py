@@ -169,6 +169,7 @@ class SlackNotifier:
     def test_connection(self) -> bool:
         """Test Slack connection"""
         test_message = {
+            "text": "🧪 Test message from AI News Scraper - connection successful!",
             "blocks": [
                 {
                     "type": "section",

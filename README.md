@@ -5,14 +5,37 @@ A Streamlit app that aggregates AI news from multiple sources and provides AI-po
 ## 🚀 Live Demo
 Deploy to Streamlit Cloud: [![Deploy](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
 
+# AI News Scraper 🤖
+
+A comprehensive Streamlit app that aggregates AI news from multiple sources, removes duplicates, and provides AI-powered summaries.
+
+## 🚀 Live Demo
+Deploy to Streamlit Cloud: [![Deploy](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
+
 ## ✨ Features
 
-- ✅ NewsAPI integration (1000 free requests/day)
-- ✅ Multiple source filtering
-- ✅ Keyword exclusion filters  
-- ✅ Clean, responsive UI
-- 🚧 RSS feeds (Google News, TechCrunch, Ars Technica) 
-- 🚧 AI summaries (OpenAI/Gemini integration)
+### 📡 **Multiple News Sources**
+- ✅ **NewsAPI** - Professional news sources (1000 free requests/day)
+- ✅ **Hacker News** - Tech community favorites with story scores
+- ✅ **RSS Feeds** - Google News, TechCrunch, Ars Technica
+- ✅ **Smart Deduplication** - Removes similar articles using fuzzy matching
+
+### 🤖 **AI-Powered Summaries**
+- ✅ **OpenAI GPT-3.5** integration for article summaries
+- ✅ **Google Gemini** integration for article summaries  
+- ✅ **2-3 sentence summaries** focusing on key insights
+
+### 🔧 **Advanced Filtering**
+- ✅ Keyword exclusion (filter out crypto, politics, etc.)
+- ✅ Source selection (mix and match sources)
+- ✅ Configurable duplicate sensitivity
+- ✅ Articles per source control
+
+### 📊 **Analytics Dashboard**
+- ✅ Source distribution metrics
+- ✅ Hacker News story scores
+- ✅ Publication timestamps
+- ✅ Article count tracking
 
 ## 🛠️ Setup
 

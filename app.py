@@ -10,6 +10,34 @@ st.set_page_config(
     layout="wide"
 )
 
+# Custom CSS for better card styling
+st.markdown("""
+<style>
+    .main > div {
+        padding-top: 2rem;
+    }
+    .stButton > button {
+        border-radius: 20px;
+        border: none;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        font-weight: 500;
+    }
+    .stButton > button:hover {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-1px);
+        transition: all 0.2s;
+    }
+    h3 a {
+        text-decoration: none !important;
+        color: #1f2937 !important;
+    }
+    h3 a:hover {
+        color: #667eea !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🤖 AI News Scraper")
 st.markdown("*Stay updated with the latest AI developments from multiple sources*")
 
@@ -160,49 +188,87 @@ if st.session_state.articles:
         avg_score = sum(article.get('score', 0) for article in st.session_state.articles) / len(st.session_state.articles)
         st.metric("Avg HN Score", f"{avg_score:.1f}")
     
-    # Display articles
+    # Display articles in card layout
     for i, article in enumerate(st.session_state.articles):
-        with st.expander(f"📄 {article['title'][:80]}{'...' if len(article['title']) > 80 else ''}", expanded=i < 3):
+        
+        # Create card container with custom CSS styling
+        with st.container():
+            # Card styling
+            st.markdown(f"""
+            <div style="
+                background: white;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                border-radius: 10px;
+                border-left: 4px solid #FF6B6B;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border: 1px solid #E1E4E8;
+            ">
+            """, unsafe_allow_html=True)
             
-            # Article metadata
-            col1, col2, col3 = st.columns([2, 1, 1])
+            # Article title (clickable)
+            st.markdown(f"### [📄 {article['title']}]({article['url']})")
+            
+            # Source and metadata row
+            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
             with col1:
-                st.markdown(f"**Source:** {article.get('source', 'Unknown')}")
+                st.markdown(f"**🏢 {article.get('source', 'Unknown')}**")
             with col2:
-                st.markdown(f"**Published:** {article.get('published', 'Unknown')[:10]}")
+                st.markdown(f"📅 {article.get('published', 'Unknown')[:10]}")
             with col3:
                 if article.get('score', 0) > 0:
-                    st.markdown(f"**HN Score:** {article['score']}")
+                    st.markdown(f"⭐ {article['score']} pts")
+            with col4:
+                st.markdown(f"#{i+1}")
             
-            # URL and description
-            st.markdown(f"**🔗 [Read Full Article]({article['url']})**")
-            
+            # Article description/preview
             if article.get('description'):
-                st.markdown(f"**Description:** {article['description']}")
+                description = article['description'][:200] + "..." if len(article['description']) > 200 else article['description']
+                st.markdown(f"*{description}*")
             
-            # AI Summary section
-            if ai_provider != "None":
-                summary_key = f"summary_{i}"
-                
-                if summary_key in st.session_state.summaries:
-                    st.markdown("**🤖 AI Summary:**")
-                    st.info(st.session_state.summaries[summary_key])
-                else:
-                    if st.button(f"🤖 Generate AI Summary", key=f"summarize_{i}"):
-                        with st.spinner("Generating AI summary..."):
-                            title = article['title']
-                            description = article.get('description', '')
-                            content = article.get('content', '')
-                            
-                            if ai_provider == "OpenAI (GPT-3.5)":
-                                summary = ai_summarizer.summarize_with_openai(title, description, content, adhd_friendly)
-                            elif ai_provider == "Google (Gemini)":
-                                summary = ai_summarizer.summarize_with_gemini(title, description, content, adhd_friendly)
-                            else:
-                                summary = "AI summary not available"
-                            
-                            st.session_state.summaries[summary_key] = summary
-                            st.rerun()
+            # Action buttons row
+            col1, col2, col3 = st.columns([2, 1, 1])
+            
+            with col1:
+                # AI Summary section
+                if ai_provider != "None":
+                    summary_key = f"summary_{i}"
+                    
+                    if summary_key in st.session_state.summaries:
+                        st.markdown("**🧠 AI Summary:**")
+                        st.info(st.session_state.summaries[summary_key])
+                    else:
+                        if st.button(f"🤖 Get AI Summary", key=f"summarize_{i}", type="secondary"):
+                            with st.spinner("Generating AI summary..."):
+                                title = article['title']
+                                description = article.get('description', '')
+                                content = article.get('content', '')
+                                
+                                if ai_provider == "OpenAI (GPT-3.5)":
+                                    summary = ai_summarizer.summarize_with_openai(title, description, content, adhd_friendly)
+                                elif ai_provider == "Google (Gemini)":
+                                    summary = ai_summarizer.summarize_with_gemini(title, description, content, adhd_friendly)
+                                else:
+                                    summary = "AI summary not available"
+                                
+                                st.session_state.summaries[summary_key] = summary
+                                st.rerun()
+            
+            with col2:
+                # Read full article button
+                st.markdown(f"[📖 Read Full]({article['url']})")
+            
+            with col3:
+                # Share button (placeholder)
+                if st.button("🔗 Share", key=f"share_{i}"):
+                    st.write("📋 URL copied to clipboard!")
+                    st.code(article['url'])
+            
+            # Close card div
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Add some spacing between cards
+            st.markdown("<br>", unsafe_allow_html=True)
 
 else:
     st.info("👆 Click 'Refresh News' to load articles from your selected sources")

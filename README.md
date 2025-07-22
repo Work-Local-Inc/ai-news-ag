@@ -50,10 +50,12 @@ cd ai-news-ag
 pip install -r requirements.txt
 ```
 
-3. **Get your NewsAPI key:**
-   - Sign up at [NewsAPI.org](https://newsapi.org/register) (free)
+3. **Get your API keys:**
+   - **NewsAPI:** Sign up at [NewsAPI.org](https://newsapi.org/register) (free, 1000/day)
+   - **OpenAI (optional):** Get key at [platform.openai.com](https://platform.openai.com/api-keys) (paid)
+   - **Google Gemini (optional):** Get key at [ai.google.dev](https://ai.google.dev/) (has free tier!)
    - Copy `.env.example` to `.env`
-   - Add your API key to `.env`
+   - Add your API keys to `.env`
 
 4. **Run the app:**
 ```bash

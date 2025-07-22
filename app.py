@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from news_fetcher import NewsAPI, HackerNewsFetcher, RSSFetcher, ArticleDeduplicator, AISummaryGenerator
+from news_fetcher import NewsAPI, HackerNewsFetcher, RSSFetcher, ArticleDeduplicator, AISummaryGenerator, ArticleImageExtractor
 from datetime import datetime
 import time
 
@@ -10,31 +10,72 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for card-like containers
+# Custom CSS for proper card styling with borders and images
 st.markdown("""
 <style>
     .main > div {
         padding-top: 1rem;
     }
-    /* Style containers to look like cards */
-    div[data-testid="column"] > div > div > div {
+    
+    /* Card container styling */
+    .card-container {
         background: white;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #e1e4e8;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
-        height: auto;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
     }
+    
+    .card-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .card-content {
+        padding: 1rem;
+    }
+    
     .stButton > button {
         border-radius: 6px;
         font-weight: 500;
         width: 100%;
+        margin: 0.25rem 0;
     }
+    
     h3 {
         color: #1f2937;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .source-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hn-badge {
+        background: #ff6600;
+        color: white;
+    }
+    
+    .other-badge {
+        background: #3b82f6;
+        color: white;
     }
 </style>
 """, unsafe_allow_html=True)

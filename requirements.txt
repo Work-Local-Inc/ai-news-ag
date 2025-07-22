@@ -8,3 +8,5 @@ pandas
 requests
 fuzzywuzzy
 python-levenshtein
+beautifulsoup4
+beautifulsoup4

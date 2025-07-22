@@ -155,7 +155,7 @@ class AISummaryGenerator:
         if self.google_api_key:
             genai.configure(api_key=self.google_api_key)
     
-    def summarize_with_openai(self, title, description, content=""):
+    def summarize_with_openai(self, title, description, content="", adhd_friendly=False):
         """Generate summary using OpenAI"""
         try:
             if not self.openai_api_key:
@@ -163,21 +163,34 @@ class AISummaryGenerator:
             
             text_to_summarize = f"Title: {title}\nDescription: {description}\nContent: {content[:1000]}"
             
+            if adhd_friendly:
+                system_prompt = """You are an AI news analyst specializing in ADHD-friendly summaries. Create summaries that are:
+- Bullet points instead of paragraphs
+- Key insight first (most important info upfront)  
+- Short, punchy sentences
+- Action items if relevant
+- Easy to scan quickly"""
+                
+                user_prompt = f"Create an ADHD-friendly summary of this AI news article:\n\n{text_to_summarize}\n\nFormat:\n• **Key Insight:** [main point]\n• **Why It Matters:** [implications]\n• **Bottom Line:** [actionable takeaway]"
+            else:
+                system_prompt = "You are an AI news analyst. Provide concise, informative summaries of AI-related articles. Focus on key insights, implications, and what makes this newsworthy."
+                user_prompt = f"Summarize this AI news article in 2-3 sentences:\n\n{text_to_summarize}"
+            
             client = openai.OpenAI()
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are an AI news analyst. Provide concise, informative summaries of AI-related articles. Focus on key insights, implications, and what makes this newsworthy."},
-                    {"role": "user", "content": f"Summarize this AI news article in 2-3 sentences:\n\n{text_to_summarize}"}
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
                 ],
-                max_tokens=150,
+                max_tokens=200 if adhd_friendly else 150,
                 temperature=0.3
             )
             return response.choices[0].message.content
         except Exception as e:
             return f"OpenAI summary error: {str(e)}"
     
-    def summarize_with_gemini(self, title, description, content=""):
+    def summarize_with_gemini(self, title, description, content="", adhd_friendly=False):
         """Generate summary using Google Gemini"""
         try:
             if not self.google_api_key:
@@ -186,7 +199,18 @@ class AISummaryGenerator:
             model = genai.GenerativeModel('gemini-pro')
             text_to_summarize = f"Title: {title}\nDescription: {description}\nContent: {content[:1000]}"
             
-            prompt = f"Summarize this AI news article in 2-3 sentences, focusing on key insights and implications:\n\n{text_to_summarize}"
+            if adhd_friendly:
+                prompt = f"""Create an ADHD-friendly summary of this AI news article. Use this format:
+
+• **Key Insight:** [main point in one sentence]
+• **Why It Matters:** [implications and context]  
+• **Bottom Line:** [actionable takeaway or what to expect]
+
+Article to summarize:
+{text_to_summarize}"""
+            else:
+                prompt = f"Summarize this AI news article in 2-3 sentences, focusing on key insights and implications:\n\n{text_to_summarize}"
+            
             response = model.generate_content(prompt)
             return response.text
         except Exception as e:

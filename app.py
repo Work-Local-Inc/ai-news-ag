@@ -47,6 +47,12 @@ ai_provider = st.sidebar.selectbox(
     help="Requires API keys in .env file"
 )
 
+adhd_friendly = st.sidebar.checkbox(
+    "🎯 ADHD-Friendly Summaries",
+    value=True,
+    help="Bullet points, key insights first, easy to scan"
+)
+
 # Filter keywords to exclude
 exclude_keywords = st.sidebar.text_area(
     "Exclude Keywords (comma-separated):",
@@ -189,9 +195,9 @@ if st.session_state.articles:
                             content = article.get('content', '')
                             
                             if ai_provider == "OpenAI (GPT-3.5)":
-                                summary = ai_summarizer.summarize_with_openai(title, description, content)
+                                summary = ai_summarizer.summarize_with_openai(title, description, content, adhd_friendly)
                             elif ai_provider == "Google (Gemini)":
-                                summary = ai_summarizer.summarize_with_gemini(title, description, content)
+                                summary = ai_summarizer.summarize_with_gemini(title, description, content, adhd_friendly)
                             else:
                                 summary = "AI summary not available"
                             

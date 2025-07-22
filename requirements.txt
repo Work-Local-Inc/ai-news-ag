@@ -1,0 +1,7 @@
+streamlit
+requests
+feedparser
+python-dotenv
+openai
+google-generativeai
+pandas

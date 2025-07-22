@@ -10,30 +10,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for better card styling
+# Custom CSS for better styling (simplified for cloud deployment)
 st.markdown("""
 <style>
     .main > div {
-        padding-top: 2rem;
+        padding-top: 1rem;
     }
     .stButton > button {
-        border-radius: 20px;
-        border: none;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white !important;
+        border-radius: 8px;
         font-weight: 500;
     }
-    .stButton > button:hover {
-        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
-        transform: translateY(-1px);
-        transition: all 0.2s;
-    }
-    h3 a {
-        text-decoration: none !important;
-        color: #1f2937 !important;
-    }
-    h3 a:hover {
-        color: #667eea !important;
+    h3 {
+        color: #1f2937;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0.5rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -188,58 +178,53 @@ if st.session_state.articles:
         avg_score = sum(article.get('score', 0) for article in st.session_state.articles) / len(st.session_state.articles)
         st.metric("Avg HN Score", f"{avg_score:.1f}")
     
-    # Display articles in card layout
+    # Display articles in clean card layout
     for i, article in enumerate(st.session_state.articles):
         
-        # Create card container with custom CSS styling
+        # Create a bordered container for each article
         with st.container():
-            # Card styling
-            st.markdown(f"""
-            <div style="
-                background: white;
-                padding: 1.5rem;
-                margin: 1rem 0;
-                border-radius: 10px;
-                border-left: 4px solid #FF6B6B;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                border: 1px solid #E1E4E8;
-            ">
-            """, unsafe_allow_html=True)
+            # Use columns for better layout
+            title_col, meta_col = st.columns([3, 1])
             
-            # Article title (clickable)
-            st.markdown(f"### [📄 {article['title']}]({article['url']})")
+            with title_col:
+                # Article title as clickable link with emoji
+                st.markdown(f"### 📄 [{article['title']}]({article['url']})")
             
-            # Source and metadata row
-            col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-            with col1:
-                st.markdown(f"**🏢 {article.get('source', 'Unknown')}**")
-            with col2:
-                st.markdown(f"📅 {article.get('published', 'Unknown')[:10]}")
-            with col3:
+            with meta_col:
+                # Article number and score
                 if article.get('score', 0) > 0:
-                    st.markdown(f"⭐ {article['score']} pts")
-            with col4:
-                st.markdown(f"#{i+1}")
+                    st.metric("HN Score", f"{article['score']} pts")
+                else:
+                    st.metric("Article", f"#{i+1}")
             
-            # Article description/preview
-            if article.get('description'):
-                description = article['description'][:200] + "..." if len(article['description']) > 200 else article['description']
-                st.markdown(f"*{description}*")
-            
-            # Action buttons row
-            col1, col2, col3 = st.columns([2, 1, 1])
-            
+            # Metadata row
+            col1, col2, col3 = st.columns(3)
             with col1:
+                st.markdown(f"**🏢 Source:** {article.get('source', 'Unknown')}")
+            with col2:
+                st.markdown(f"**📅 Date:** {article.get('published', 'Unknown')[:10]}")
+            with col3:
+                st.markdown(f"**🔗 [Read Full Article]({article['url']})**")
+            
+            # Article description in a nice info box
+            if article.get('description'):
+                description = article['description'][:300] + "..." if len(article['description']) > 300 else article['description']
+                st.info(f"📋 {description}")
+            
+            # Action buttons
+            button_col1, button_col2, button_col3 = st.columns([2, 1, 1])
+            
+            with button_col1:
                 # AI Summary section
                 if ai_provider != "None":
                     summary_key = f"summary_{i}"
                     
                     if summary_key in st.session_state.summaries:
-                        st.markdown("**🧠 AI Summary:**")
-                        st.info(st.session_state.summaries[summary_key])
+                        st.success("🧠 AI Summary:")
+                        st.markdown(st.session_state.summaries[summary_key])
                     else:
-                        if st.button(f"🤖 Get AI Summary", key=f"summarize_{i}", type="secondary"):
-                            with st.spinner("Generating AI summary..."):
+                        if st.button(f"🤖 Generate AI Summary", key=f"summarize_{i}", type="primary"):
+                            with st.spinner("🧠 Generating AI summary..."):
                                 title = article['title']
                                 description = article.get('description', '')
                                 content = article.get('content', '')
@@ -254,21 +239,19 @@ if st.session_state.articles:
                                 st.session_state.summaries[summary_key] = summary
                                 st.rerun()
             
-            with col2:
-                # Read full article button
-                st.markdown(f"[📖 Read Full]({article['url']})")
+            with button_col2:
+                # Quick share button
+                if st.button("📤 Share", key=f"share_{i}"):
+                    st.code(article['url'], language=None)
+                    st.success("📋 URL ready to copy!")
             
-            with col3:
-                # Share button (placeholder)
-                if st.button("🔗 Share", key=f"share_{i}"):
-                    st.write("📋 URL copied to clipboard!")
-                    st.code(article['url'])
+            with button_col3:
+                # Source badge
+                source_color = "🟢" if article.get('source') == "Hacker News" else "🔵"
+                st.markdown(f"{source_color} **{article.get('source', 'Unknown')}**")
             
-            # Close card div
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            # Add some spacing between cards
-            st.markdown("<br>", unsafe_allow_html=True)
+            # Separator between articles
+            st.divider()
 
 else:
     st.info("👆 Click 'Refresh News' to load articles from your selected sources")
